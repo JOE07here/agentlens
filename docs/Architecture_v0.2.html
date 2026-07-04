@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentLens — Architecture v0.2 (Web)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6F8;--surface:#FFFFFF;--ink:#161A22;--ink-soft:#4C5462;--line:#DCE0E7;
+    --primary:#2C3A8C;--primary-soft:#EAEDF8;--teal:#0E7A6E;--teal-soft:#E2F4F1;--amber-soft:#FDF3E3;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px;}
+
+  .mast{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 28px 24px;box-shadow:0 1px 2px rgba(20,26,34,.04);}
+  .eyebrow{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--primary);margin:0 0 10px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:32px;line-height:1.12;margin:0 0 6px;letter-spacing:-.01em;}
+  .tagline{font-size:17px;color:var(--ink-soft);margin:0 0 18px;max-width:64ch;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 22px;border-top:1px solid var(--line);padding-top:16px;font-size:13.5px;}
+  .meta b{font-weight:600;}.meta span{color:var(--ink-soft);}
+
+  section{margin-top:34px;}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:600;margin:0 0 14px;padding-left:14px;border-left:4px solid var(--primary);line-height:1.25;}
+  .num{color:var(--primary);font-weight:700;margin-right:8px;}
+  h3{font-size:15.5px;font-weight:700;margin:18px 0 8px;}
+  p{margin:0 0 12px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;box-shadow:0 1px 2px rgba(20,26,34,.04);}
+  ul{margin:0 0 4px;padding-left:20px;}li{margin:6px 0;}
+
+  .changed{background:var(--amber-soft);border:1px solid #EBC88A;border-left:5px solid #B45309;border-radius:12px;padding:16px 20px;font-size:14.5px;}
+  .changed b{color:#7A3A06;}
+
+  .locked{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .lock{background:var(--teal-soft);border:1px solid #BFE6E0;border-radius:12px;padding:16px 18px;}
+  .lock .k{font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#0B5C53;margin:0 0 6px;font-weight:700;}
+  .lock .v{font-size:14.5px;font-weight:600;margin:0 0 4px;}
+  .lock .w{font-size:12.5px;color:var(--ink-soft);margin:0;}
+
+  .pipe{display:flex;align-items:stretch;gap:0;margin:6px 0 0;flex-wrap:nowrap;}
+  .stage{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center;box-shadow:0 1px 2px rgba(20,26,34,.04);min-width:0;}
+  .stage.moat{background:var(--teal-soft);border-color:#9FD8CF;border-width:2px;}
+  .stage .sn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;font-size:12px;font-family:'Space Grotesk',sans-serif;margin-bottom:7px;}
+  .stage.moat .sn{background:var(--teal);}
+  .stage .st{font-weight:700;font-size:12.5px;margin:0 0 3px;font-family:'Space Grotesk',sans-serif;}
+  .stage .sd{font-size:11px;color:var(--ink-soft);line-height:1.35;}
+  .arrow{display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:18px;font-weight:700;padding:0 3px;flex:0 0 auto;}
+  .moatlabel{display:inline-block;background:var(--teal);color:#fff;font-size:9.5px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:4px;margin-bottom:5px;text-transform:uppercase;}
+
+  .crosscut{margin-top:12px;background:var(--primary-soft);border:1px dashed #B7C0E6;border-radius:12px;padding:14px 18px;font-size:14px;}
+  .crosscut b{color:var(--primary);}
+
+  pre{background:#1A2233;color:#E7ECF5;border-radius:12px;padding:18px 20px;overflow-x:auto;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.55;margin:6px 0 0;}
+  pre .c{color:#8A97AE;}pre .d{color:#7FB2FF;}pre .f{color:#9EE6C9;}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:#EEF1F5;padding:1px 6px;border-radius:5px;color:#243049;}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px;border-radius:10px;overflow:hidden;border:1px solid var(--line);}
+  .tbl th{background:var(--primary);color:#fff;text-align:left;font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;padding:10px 12px;}
+  .tbl td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top;}
+  .tbl tr:nth-child(even) td{background:#FAFBFC;}
+  .tbl code{font-size:12.5px;}
+
+  .comp{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .ccard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+  .ccard.moat{background:var(--teal-soft);border-color:#9FD8CF;}
+  .ccard h4{margin:0 0 6px;font-size:14.5px;font-family:'Space Grotesk',sans-serif;color:var(--primary);}
+  .ccard.moat h4{color:#0B5C53;}
+  .ccard p{margin:0;font-size:13.5px;color:var(--ink-soft);}
+
+  .note{border-left:4px solid #B45309;background:#FDF6EC;padding:14px 18px;border-radius:0 10px 10px 0;font-size:14.5px;margin-top:14px;}
+  .note b{color:#7A3A06;}
+
+  .grow{display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;margin-top:6px;}
+  .gstep{flex:1;border-radius:12px;padding:16px;min-width:0;}
+  .gstep.g1{background:var(--teal-soft);border:1px solid #BFE6E0;}
+  .gstep.g2{background:#F4F2FB;border:1px solid #D9D2F0;}
+  .gstep.g3{background:#FBEEEC;border:1px solid #F2CFC9;}
+  .gstep .gt{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;margin:0 0 8px;}
+  .gstep.g1 .gt{color:#0B5C53;}.gstep.g2 .gt{color:#3B2E86;}.gstep.g3 .gt{color:#9A2B16;}
+  .gstep ul{padding-left:16px;margin:0;}.gstep li{font-size:12.5px;margin:5px 0;}
+  .garrow{display:flex;align-items:center;color:var(--ink-soft);font-size:18px;padding:0 6px;}
+
+  .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);}
+
+  @media (max-width:760px){
+    h1{font-size:25px;}
+    .locked,.comp{grid-template-columns:1fr;}
+    .pipe,.grow{flex-direction:column;}
+    .arrow{transform:rotate(90deg);padding:5px 0;}
+    .garrow{transform:rotate(90deg);padding:5px 0;align-self:center;}
+    .wrap{padding:20px 14px 60px;}.mast{padding:22px 18px;}
+  }
+  @media print{body{background:#fff;}.wrap{max-width:none;padding:0;}.mast,.card,.tbl,.stage{box-shadow:none;}section{page-break-inside:avoid;}pre{white-space:pre-wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="eyebrow">System Architecture · v0.2 (Web)</p>
+    <h1>AgentLens — Architecture v0.2</h1>
+    <p class="tagline">Rebuilt as a browser-only web app. Same analysis pipeline, now running entirely client-side — and with cross-stack correlation (your moat) promoted to its own stage.</p>
+    <div class="meta">
+      <span><b>Version:</b> 0.2 — supersedes v0.1</span>
+      <span><b>Owner:</b> Joe</span>
+      <span><b>Stack:</b> Next.js + TypeScript</span>
+      <span><b>Build with:</b> Claude Code</span>
+    </div>
+  </header>
+
+  <!-- WHAT CHANGED -->
+  <section>
+    <div class="changed">
+      <b>What changed from v0.1:</b> form factor is now a <b>web app</b> (not a CLI), the engine is <b>TypeScript</b> (not Python), and all processing runs <b>in the browser</b> (not on a server). Everything else — the pipeline, the canonical model, the growth path — carries over. The competitor research also promoted <b>cross-stack correlation</b> to a first-class stage, since it's the one thing nobody else does.
+    </div>
+  </section>
+
+  <!-- LOCKED -->
+  <section>
+    <h2><span class="num">01</span>Locked decisions</h2>
+    <div class="locked">
+      <div class="lock"><p class="k">Form factor</p><p class="v">Web app (Next.js)</p><p class="w">TypeScript + Tailwind. Claude-Code-friendly, SaaS-ready.</p></div>
+      <div class="lock"><p class="k">Where it runs</p><p class="v">100% client-side</p><p class="w">Files parsed in the browser. No server, no upload, no DB.</p></div>
+      <div class="lock"><p class="k">LLM summaries</p><p class="v">Parked</p><p class="w">Keeps the "nothing leaves your browser" promise intact.</p></div>
+    </div>
+    <div class="note"><b>Why client-side is the smart call:</b> even when deployed and public, no one's identity data ever touches a server — it's read and analysed in their own browser. That's zero hosting cost <i>and</i> a real enterprise-trust selling point.</div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section>
+    <h2><span class="num">02</span>The pipeline — now six stages</h2>
+    <p>Each scan runs this sequence inside the browser tab. Stage 3 is the one your competitors can't match.</p>
+    <div class="pipe">
+      <div class="stage"><div class="sn">1</div><p class="st">Ingest</p><p class="sd">Read MidPoint + Keycloak files</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="sn">2</div><p class="st">Normalize</p><p class="sd">Map to one model; tag non-human</p></div>
+      <div class="arrow">→</div>
+      <div class="stage moat"><span class="moatlabel">Moat</span><div class="sn">3</div><p class="st">Correlate</p><p class="sd">Link the same agent across both systems</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="sn">4</div><p class="st">Analyze</p><p class="sd">Run the risk rules</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="sn">5</div><p class="st">Score</p><p class="sd">Rank findings</p></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="sn">6</div><p class="st">Report</p><p class="sd">Render + export</p></div>
+    </div>
+    <div class="crosscut"><b>The new stage 3 — Correlate:</b> match a MidPoint identity to its Keycloak OAuth client (by name, owner, or a mapping rule) so one real agent shows up <b>once</b>, with its full picture: governance roles <i>and</i> auth client <i>and</i> its secret. This is the cross-stack view no competitor offers — make it the product's headline.</div>
+  </section>
+
+  <!-- COMPONENTS -->
+  <section>
+    <h2><span class="num">03</span>Components (TypeScript modules)</h2>
+    <div class="comp">
+      <div class="ccard"><h4>① Source adapters</h4><p><code>midpointAdapter</code> parses the XML/CSV export; <code>keycloakAdapter</code> parses the JSON realm export. Both run in-browser via a parser like <code>fast-xml-parser</code>.</p></div>
+      <div class="ccard"><h4>② Normalizer + classifier</h4><p>Folds both into the canonical model and tags human vs non-human/agent with configurable patterns.</p></div>
+      <div class="ccard moat"><h4>③ Correlator — the moat</h4><p>Links a MidPoint identity to its Keycloak client into one logical agent. The differentiator; give it real care.</p></div>
+      <div class="ccard"><h4>④ Rule engine</h4><p>Pluggable rules over the model: over-privilege, dormancy, SoD conflict, standing credential — each emits findings with a plain reason.</p></div>
+      <div class="ccard"><h4>⑤ Scorer</h4><p>Levels each finding (High/Med/Low) and ranks them worst-first.</p></div>
+      <div class="ccard"><h4>⑥ Report view + export</h4><p>A React view with risk badges; export to standalone HTML (browser print → PDF) and JSON/CSV.</p></div>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section>
+    <h2><span class="num">04</span>Tech stack</h2>
+    <table class="tbl">
+      <thead><tr><th>Concern</th><th>Choice</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Framework</td><td><code>Next.js</code> (App Router)</td><td>One stack now, smooth path to SaaS later. Excellent Claude Code support.</td></tr>
+        <tr><td>Language</td><td><code>TypeScript</code></td><td>Type-safe canonical model; same code carries into the SaaS.</td></tr>
+        <tr><td>Styling</td><td><code>Tailwind</code></td><td>Fast, and easy to hit your high-contrast colour rules.</td></tr>
+        <tr><td>XML parsing</td><td><code>fast-xml-parser</code></td><td>Browser-compatible MidPoint XML parsing.</td></tr>
+        <tr><td>JSON parsing</td><td>native</td><td>Keycloak realm export is JSON.</td></tr>
+        <tr><td>Charts (optional)</td><td><code>recharts</code></td><td>Risk breakdown donut/bar. A SHOULD, not a MUST.</td></tr>
+        <tr><td>State</td><td>React state</td><td>One scan in memory. No store needed in v0.1.</td></tr>
+        <tr><td>Backend / DB</td><td><b>None in v0.1</b> · <code>Supabase</code> later</td><td>Client-side now; add Supabase (Postgres + Auth + RLS) for history &amp; accounts.</td></tr>
+        <tr><td>Deploy</td><td>Vercel / static</td><td>Free-tier friendly; nothing server-side to run.</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><b>Deliberately avoided in v0.1:</b> any backend, database, auth, or external API call. Smaller, faster, free to host — and it keeps the privacy promise.</div>
+  </section>
+
+  <!-- STRUCTURE -->
+  <section>
+    <h2><span class="num">05</span>Project structure (Next.js)</h2>
+    <pre><span class="d">agentlens/</span>
+├─ <span class="d">app/</span>
+│   ├─ <span class="f">page.tsx</span>         <span class="c"># upload screen + run scan</span>
+│   └─ <span class="d">report/</span>          <span class="c"># results view</span>
+├─ <span class="d">components/</span>        <span class="c"># UI: FileDrop, FindingRow, RiskBadge, SummaryCards</span>
+├─ <span class="d">lib/</span>
+│   ├─ <span class="d">model/</span>
+│   │   └─ <span class="f">types.ts</span>      <span class="c"># Identity, Access, Credential, Finding, ScanResult</span>
+│   ├─ <span class="d">adapters/</span>
+│   │   ├─ <span class="f">midpoint.ts</span>
+│   │   └─ <span class="f">keycloak.ts</span>
+│   ├─ <span class="f">normalize.ts</span>    <span class="c"># + human/non-human classification</span>
+│   ├─ <span class="f">correlate.ts</span>    <span class="c"># the moat — link identity ↔ client</span>
+│   ├─ <span class="d">rules/</span>
+│   │   ├─ <span class="f">overPrivilege.ts</span>  <span class="f">dormancy.ts</span>
+│   │   └─ <span class="f">sodConflict.ts</span>    <span class="f">standingCredential.ts</span>
+│   ├─ <span class="f">score.ts</span>
+│   └─ <span class="d">report/</span>
+│       ├─ <span class="f">exportHtml.ts</span>   <span class="f">exportData.ts</span>
+└─ <span class="d">config/</span>            <span class="c"># rules.json, sodConflicts.json, classification.json</span></pre>
+  </section>
+
+  <!-- GROWTH -->
+  <section>
+    <h2><span class="num">06</span>Same growth path — engine never thrown away</h2>
+    <div class="grow">
+      <div class="gstep g1"><p class="gt">▸ Now — v0.x web app</p><ul><li>Client-side, file in → report</li><li>2 adapters · correlate · 4 rules</li><li>Offline, free to host</li><li>Thesis evidence</li></ul></div>
+      <div class="garrow">→</div>
+      <div class="gstep g2"><p class="gt">▸ Next — history &amp; accounts</p><ul><li>Add Supabase (Postgres + Auth)</li><li>Save scans → trends</li><li>Live API connectors</li></ul></div>
+      <div class="garrow">→</div>
+      <div class="gstep g3"><p class="gt">▸ Later — the SaaS</p><ul><li>Multi-tenant + RLS</li><li>More IdPs via new adapters</li><li>SOC 2 → enterprise</li></ul></div>
+    </div>
+    <div class="note"><b>The bet still holds:</b> keep the engine source-agnostic and the data shapes stable, and going from thesis tool to SaaS stays additive — never a rewrite.</div>
+  </section>
+
+  <p class="foot">
+    AgentLens — Architecture v0.2 (Web) · supersedes v0.1.<br>
+    Pairs with: Requirements (doc 1), Data Model (doc 3), Competitors (doc 4), and the Claude Code Build Guide.
+  </p>
+
+</div>
+</body>
+</html>

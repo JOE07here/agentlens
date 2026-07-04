@@ -1,0 +1,47 @@
+{
+  "description": "Thresholds and severities for the four risk rules. Editable without touching code.",
+  "overPrivilege": {
+    "enabled": true,
+    "privilegedRolePatterns": [
+      "admin",
+      "administrator",
+      "superuser",
+      "root",
+      "owner",
+      "realm-admin",
+      "realm-management",
+      "manage-",
+      "create-",
+      "impersonation",
+      "all-access"
+    ],
+    "nonHuman": { "level": "high", "score": 90 },
+    "human": { "level": "medium", "score": 55 }
+  },
+  "dormancy": {
+    "enabled": true,
+    "dormantAfterDays": 90,
+    "level": "medium",
+    "score": 60
+  },
+  "sodConflict": {
+    "enabled": true,
+    "level": "high",
+    "score": 85
+  },
+  "standingCredential": {
+    "enabled": true,
+    "maxCredentialAgeDays": 90,
+    "flagNeverExpires": true,
+    "credentialTypes": ["secret", "apiKey", "token", "certificate"],
+    "level": "high",
+    "score": 80
+  },
+  "scoring": {
+    "thresholds": { "high": 75, "medium": 45 },
+    "modifiers": {
+      "nonHuman": 5,
+      "correlatedBothSystems": 5
+    }
+  }
+}

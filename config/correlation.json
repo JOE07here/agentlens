@@ -1,0 +1,17 @@
+{
+  "description": "How AgentLens links the same agent across MidPoint and Keycloak. Strategies are applied in order; the first match wins.",
+  "strategies": ["mapping", "exactName", "owner"],
+  "normalize": {
+    "lowercase": true,
+    "stripPrefixes": ["service-account-"],
+    "stripNonAlphanumeric": true
+  },
+  "ownerMatchRequiresNonHuman": true,
+  "mappings": [
+    {
+      "midpoint": "svc-special-legacy",
+      "keycloak": "legacy-client-0042",
+      "reason": "Manual mapping: legacy client id does not match the MidPoint name."
+    }
+  ]
+}

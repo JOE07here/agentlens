@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentLens — Claude Code Build Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F6F8;--surface:#FFFFFF;--ink:#161A22;--ink-soft:#4C5462;--line:#DCE0E7;
+    --primary:#2C3A8C;--primary-soft:#EAEDF8;--teal:#0E7A6E;--teal-soft:#E2F4F1;
+    --opus:#7A2E8C;--opus-soft:#F3E8F6;--sonnet:#1E5FB4;--sonnet-soft:#E5EFFB;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:940px;margin:0 auto;padding:32px 20px 80px;}
+
+  .mast{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 28px 24px;box-shadow:0 1px 2px rgba(20,26,34,.04);}
+  .eyebrow{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:12px;color:var(--primary);margin:0 0 10px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:32px;line-height:1.12;margin:0 0 6px;letter-spacing:-.01em;}
+  .tagline{font-size:17px;color:var(--ink-soft);margin:0 0 18px;max-width:64ch;}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 22px;border-top:1px solid var(--line);padding-top:16px;font-size:13.5px;}
+  .meta b{font-weight:600;}.meta span{color:var(--ink-soft);}
+
+  section{margin-top:34px;}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:600;margin:0 0 14px;padding-left:14px;border-left:4px solid var(--primary);line-height:1.25;}
+  .num{color:var(--primary);font-weight:700;margin-right:8px;}
+  h3{font-size:15.5px;font-weight:700;margin:18px 0 8px;}
+  p{margin:0 0 12px;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;box-shadow:0 1px 2px rgba(20,26,34,.04);}
+  ul,ol{margin:0 0 4px;padding-left:20px;}li{margin:6px 0;}
+
+  pre{background:#1A2233;color:#E7ECF5;border-radius:12px;padding:18px 20px;overflow-x:auto;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.55;margin:6px 0 0;}
+  pre .c{color:#8A97AE;}pre .k{color:#FF9D7A;}pre .h{color:#7FB2FF;}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:#EEF1F5;padding:1px 6px;border-radius:5px;color:#243049;}
+
+  .claudemd{border:2px solid var(--teal);border-radius:12px;overflow:hidden;margin-top:6px;}
+  .claudemd .hd{background:var(--teal);color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;}
+  .claudemd .hd span{font-weight:400;font-size:11px;opacity:.9;}
+  .claudemd pre{border-radius:0;margin:0;}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px;border-radius:10px;overflow:hidden;border:1px solid var(--line);}
+  .tbl th{background:var(--primary);color:#fff;text-align:left;font-weight:600;font-size:12.5px;letter-spacing:.03em;text-transform:uppercase;padding:9px 11px;}
+  .tbl td{padding:9px 11px;border-top:1px solid var(--line);vertical-align:top;}
+  .tbl tr:nth-child(even) td{background:#FAFBFC;}
+  .tbl code{font-size:12px;}
+
+  /* phase steps */
+  .phase{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 2px rgba(20,26,34,.04);}
+  .phead{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);}
+  .pn{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;}
+  .ptitle{font-weight:700;font-size:14.5px;font-family:'Space Grotesk',sans-serif;flex:1;}
+  .mtag{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:3px 9px;border-radius:6px;text-transform:uppercase;white-space:nowrap;}
+  .m-opus{background:var(--opus-soft);color:var(--opus);}
+  .m-sonnet{background:var(--sonnet-soft);color:var(--sonnet);}
+  .pbody{padding:14px 18px;}
+  .pbody .goal{font-size:13.5px;color:var(--ink-soft);margin:0 0 10px;}
+  .prompt{background:#11192B;color:#D7E0F0;border-left:3px solid var(--teal);border-radius:0 8px 8px 0;padding:11px 14px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.5;}
+  .prompt .lbl{display:block;color:#6FE0C2;font-size:10px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;font-family:'Space Grotesk',sans-serif;}
+
+  .note{border-left:4px solid #B45309;background:#FDF6EC;padding:14px 18px;border-radius:0 10px 10px 0;font-size:14.5px;margin-top:14px;}
+  .note b{color:#7A3A06;}
+  .reco{border-left:4px solid var(--teal);background:var(--teal-soft);padding:14px 18px;border-radius:0 10px 10px 0;font-size:14.5px;margin-top:14px;}
+  .reco b{color:#0B5C53;}
+
+  .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft);}
+  cite{font-style:normal;}
+
+  @media (max-width:760px){
+    h1{font-size:25px;}
+    .wrap{padding:20px 14px 60px;}.mast{padding:22px 18px;}
+    .phead{flex-wrap:wrap;}
+  }
+  @media print{body{background:#fff;}.wrap{max-width:none;padding:0;}.mast,.card,.tbl,.phase{box-shadow:none;}section{page-break-inside:avoid;}pre,.prompt{white-space:pre-wrap;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="eyebrow">Build Guide · for Claude Code</p>
+    <h1>Building AgentLens with Claude Code</h1>
+    <p class="tagline">A phased plan you can hand to Claude Code one step at a time — plus a ready-to-paste CLAUDE.md and the settings that keep token spend low.</p>
+    <div class="meta">
+      <span><b>For:</b> Joe</span>
+      <span><b>Target:</b> Next.js + TypeScript web app</span>
+      <span><b>Goal:</b> thesis &amp; portfolio build</span>
+    </div>
+  </header>
+
+  <!-- SETUP -->
+  <section>
+    <h2><span class="num">01</span>Before you start (one-time setup)</h2>
+    <div class="card">
+      <ol>
+        <li>Install a recent <b>Node.js (LTS)</b>, then install Claude Code: <code>npm install -g @anthropic-ai/claude-code</code> and run <code>claude</code> in your project folder. (Check the official Claude Code docs for current requirements.)</li>
+        <li>Make a project folder and drop your four spec docs into a <code>/docs</code> sub-folder (Requirements, Architecture v0.2, Data Model, Competitors). Claude Code can read them so it never re-invents the plan.</li>
+        <li>Add the <b>CLAUDE.md</b> below to the project root.</li>
+        <li>Apply the token settings in §03.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- CLAUDE.md -->
+  <section>
+    <h2><span class="num">02</span>Ready-to-use CLAUDE.md</h2>
+    <p>Paste this into <code>CLAUDE.md</code> at your project root. It's deliberately short — a long CLAUDE.md gets re-sent on every message and quietly burns tokens.</p>
+    <div class="claudemd">
+      <div class="hd">CLAUDE.md <span>~40 lines · keep it lean</span></div>
+<pre><span class="c"># AgentLens</span>
+
+Browser-only web app. Reads MidPoint + Keycloak exports and reports
+risky non-human / AI-agent identities. Read-only. Nothing leaves the browser.
+
+<span class="c">## Stack</span>
+- Next.js (App Router) + TypeScript (strict) + Tailwind
+- 100% client-side in v0.1: no backend, no database, no network/API calls
+- XML: fast-xml-parser. JSON: native.
+
+<span class="c">## Specs — read before building a feature</span>
+- /docs has Requirements, Architecture v0.2, Data Model, Competitors
+- Canonical types live in lib/model/types.ts — everything flows through them
+
+<span class="c">## Hard rules</span>
+- Read-only: never write back to MidPoint or Keycloak
+- No LLM, no fetch, no analytics — privacy is the product
+- Keep scan data in React state (no localStorage assumptions)
+- lib/correlate.ts (link MidPoint identity to its Keycloak client) is THE
+  core feature — treat it with extra care
+
+<span class="c">## Conventions</span>
+- TypeScript strict, no `any`
+- One file per adapter and per rule; adapters output the canonical model, rules read it
+- UI: high contrast only — light background, dark text. Never low-contrast.
+- Small, focused components
+
+<span class="c">## Build order</span>
+types → adapters → normalize → correlate → rules → score → report UI → upload wiring</pre>
+    </div>
+    <div class="note"><b>Tip:</b> <cite>if Claude can infer something from reading the code, leave it out of CLAUDE.md</cite> — and <cite>aim to keep it under 200 lines, since it loads on every message</cite>.</div>
+  </section>
+
+  <!-- TOKEN SETTINGS -->
+  <section>
+    <h2><span class="num">03</span>Settings that keep token spend low</h2>
+    <table class="tbl">
+      <thead><tr><th>Habit</th><th>What to do</th></tr></thead>
+      <tbody>
+        <tr><td><b>Plan before coding</b></td><td>Enter plan mode (Shift+Tab twice) for any non-trivial phase; have it write the plan, then approve. Point it at the relevant <code>/docs</code> file.</td></tr>
+        <tr><td><b>Right-size the model</b></td><td><cite>Sonnet handles most coding tasks and costs less than Opus; reserve Opus for complex work, switch with /model.</cite> Or use the <code>opusplan</code> alias to plan in Opus and build in Sonnet automatically.</td></tr>
+        <tr><td><b>Clear between phases</b></td><td><cite>Use /clear when switching to unrelated work, since stale context wastes tokens on every later message.</cite> Start each phase fresh.</td></tr>
+        <tr><td><b>Compact mid-phase</b></td><td>Use <code>/compact</code> at a breakpoint if a phase runs long — but not after sitting idle.</td></tr>
+        <tr><td><b>Cap thinking on simple tasks</b></td><td>For boilerplate phases, set <code>MAX_THINKING_TOKENS</code> lower; keep full thinking for Correlate and the rules.</td></tr>
+        <tr><td><b>Be specific</b></td><td>Name the file and the outcome (the prompts below already do this). Vague prompts cost the most.</td></tr>
+        <tr><td><b>Watch spend</b></td><td>Run <code>/cost</code> to build a feel for what each phase should cost.</td></tr>
+      </tbody>
+    </table>
+    <div class="reco"><b>The biggest saver isn't a setting — it's that you already have the specs.</b> Front-loading the thinking (which you've done) is what stops Claude Code burning tokens rediscovering what to build. Spend your Opus budget only on Correlate and the rule logic.</div>
+  </section>
+
+  <!-- BUILD PLAN -->
+  <section>
+    <h2><span class="num">04</span>The phased build plan</h2>
+    <p>Run these in order, one per session, <code>/clear</code> between them. Each has a ready prompt. Badges show which model to use.</p>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">0</div><div class="ptitle">Scaffold the app</div><span class="mtag m-sonnet">Sonnet</span></div>
+      <div class="pbody">
+        <p class="goal">Empty Next.js project with the right structure.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Create a Next.js App Router project with TypeScript (strict) and Tailwind, no backend. Read /docs/Architecture_v0.2 and create the empty folder structure from its project-structure section (lib/model, lib/adapters, lib/rules, components, config). Add empty stub files. Don't implement logic yet.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">1</div><div class="ptitle">Canonical types</div><span class="mtag m-sonnet">Sonnet</span></div>
+      <div class="pbody">
+        <p class="goal">The data model everything flows through.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>In lib/model/types.ts, implement the canonical model exactly as in /docs/Data_Model section 3: the Source, IdentityType, RiskLevel unions and the Identity, Access, Credential, Finding, and ScanResult interfaces.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">2</div><div class="ptitle">Sample export files</div><span class="mtag m-sonnet">Sonnet</span></div>
+      <div class="pbody">
+        <p class="goal">Test data so you can build without a live system.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Under /samples, create a small MidPoint XML export and a Keycloak JSON realm export with a mix of human and non-human identities — include one service account that has an admin role and a long-lived secret, and one dormant account.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">3</div><div class="ptitle">MidPoint + Keycloak adapters</div><span class="mtag m-sonnet">Sonnet</span></div>
+      <div class="pbody">
+        <p class="goal">Turn raw exports into the canonical model.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Implement lib/adapters/midpoint.ts (parse the sample MidPoint XML with fast-xml-parser) and lib/adapters/keycloak.ts (parse the sample Keycloak JSON), each returning Identity[] with access and credentials. Add a vitest test for each against the /samples files.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">4</div><div class="ptitle">Normalize + classify</div><span class="mtag m-sonnet">Sonnet</span></div>
+      <div class="pbody">
+        <p class="goal">Merge both sources; tag human vs non-human.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Implement lib/normalize.ts to merge both adapters' output into one list and classify each identity as human or non-human using patterns in config/classification.json.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">5</div><div class="ptitle">Correlate — the moat</div><span class="mtag m-opus">Opus · plan first</span></div>
+      <div class="pbody">
+        <p class="goal">Link the same agent across MidPoint and Keycloak. This is the differentiator.</p>
+        <div class="prompt"><span class="lbl">Prompt (enter plan mode first)</span>Implement lib/correlate.ts: link a MidPoint identity to its Keycloak OAuth client into one logical agent, matching by name/owner with a configurable mapping in config. Plan the matching logic and edge cases (no match, many-to-one, ambiguous names) before writing code. This is the core feature — be careful.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">6</div><div class="ptitle">The four risk rules</div><span class="mtag m-opus">Opus (logic) → Sonnet (wiring)</span></div>
+      <div class="pbody">
+        <p class="goal">Over-privilege, dormancy, SoD conflict, standing credential.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Implement the four rules in lib/rules/ per /docs/Requirements FR-05 to FR-08. Each takes the correlated model and returns Finding[] with a plain-language rationale and a recommendedAction. Read thresholds and the SoD conflict list from config/rules.json and config/sodConflicts.json.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">7</div><div class="ptitle">Score &amp; rank</div><span class="mtag m-sonnet">Sonnet</span></div>
+      <div class="pbody">
+        <p class="goal">Level each finding and sort worst-first.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Implement lib/score.ts: assign each finding a risk level (high/medium/low) and a numeric score from config, then return findings ranked worst-first, plus a summary count by level.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">8</div><div class="ptitle">Report UI</div><span class="mtag m-sonnet">Sonnet</span></div>
+      <div class="pbody">
+        <p class="goal">Show the results — clearly and in high contrast.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Build the report view: SummaryCards (counts by risk), a ranked list of FindingRow with a RiskBadge, and a per-agent cross-stack panel showing its MidPoint roles + Keycloak client + secret together. Use a high-contrast palette: light background, dark text, coloured risk badges.</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">9</div><div class="ptitle">Upload + wire it together + export</div><span class="mtag m-sonnet">Sonnet</span></div>
+      <div class="pbody">
+        <p class="goal">The end-to-end flow, all client-side.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Build the upload screen (a FileDrop for the two export files), run the full pipeline in the browser on click (ingest → normalize → correlate → rules → score), and render the report. Add lib/report/exportHtml.ts (standalone HTML) and exportData.ts (JSON + CSV).</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phead"><div class="pn">10</div><div class="ptitle">Polish &amp; real-data test</div><span class="mtag m-sonnet">Sonnet · Opus for tricky bugs</span></div>
+      <div class="pbody">
+        <p class="goal">Make it robust against messy real exports.</p>
+        <div class="prompt"><span class="lbl">Prompt</span>Add empty and error states (no file, unparseable file), then test the whole flow against a real export from demo.evolveum.com and fix any parsing edge cases.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section>
+    <h2><span class="num">05</span>Definition of done (v0.1)</h2>
+    <div class="card">
+      <ul>
+        <li>Runs entirely in the browser — no server, no upload.</li>
+        <li>Ingests a real MidPoint export and a real Keycloak export.</li>
+        <li><b>Correlates</b> agents across both systems into one view.</li>
+        <li>Produces ranked findings, each with a plain-language reason and a recommended action.</li>
+        <li>Exports a standalone report (HTML/PDF) plus JSON/CSV.</li>
+      </ul>
+      <p style="margin:12px 0 0;">Hit that, and you have your thesis artifact, your portfolio demo, and your LinkedIn proof-of-work — the three things this whole project is actually for.</p>
+    </div>
+  </section>
+
+  <p class="foot">
+    AgentLens — Claude Code Build Guide. Pairs with Requirements, Architecture v0.2, Data Model, and Competitors.<br>
+    Token guidance reflects Claude Code's official cost docs (June 2026); commands and settings can change — check the docs if something differs.
+  </p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "description": "Pairs of duties that should not be held by the same agent. Role names are matched case-insensitively against the agent's access.",
+  "conflicts": [
+    {
+      "a": "payment-initiator",
+      "b": "payment-approver",
+      "reason": "The same agent can both initiate and approve payments, removing the four-eyes control over money movement."
+    },
+    {
+      "a": "vendor-create",
+      "b": "vendor-approve",
+      "reason": "The same agent can both create and approve vendors, enabling fraudulent payee setup."
+    },
+    {
+      "a": "developer",
+      "b": "production-deployer",
+      "reason": "The same agent can write code and deploy it to production with no independent review."
+    },
+    {
+      "a": "user-admin",
+      "b": "auditor",
+      "reason": "The same agent can manage users and audit that activity, letting it cover its own tracks."
+    }
+  ]
+}

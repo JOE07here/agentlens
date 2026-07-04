@@ -1,0 +1,33 @@
+{
+  "description": "Patterns used to classify an identity as human or non-human (machine / AI agent). Keycloak OAuth clients are always treated as non-human.",
+  "keycloakClientsAreNonHuman": true,
+  "defaultType": "unknown",
+  "nonHumanNamePatterns": [
+    "^svc[-_.]",
+    "[-_.]svc$",
+    "^sa[-_.]",
+    "[-_.]sa$",
+    "service[-_.]?account",
+    "\\bservice\\b",
+    "\\bsystem\\b",
+    "\\bbot\\b",
+    "\\bagent\\b",
+    "\\bapi\\b",
+    "integration",
+    "automation",
+    "\\bdaemon\\b",
+    "\\brobot\\b",
+    "\\brpa\\b",
+    "pipeline",
+    "scanner",
+    "^app[-_.]",
+    "[-_.]app$",
+    "connector",
+    "sync",
+    "ingest",
+    "worker"
+  ],
+  "humanNamePatterns": [
+    "^[a-z]+\\.[a-z]+$"
+  ]
+}

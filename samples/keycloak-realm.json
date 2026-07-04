@@ -1,0 +1,128 @@
+{
+  "realm": "example",
+  "enabled": true,
+  "_comment": "Sample Keycloak realm export. svc-payment-bot and svc-data-sync mirror MidPoint identities; legacy-integration is Keycloak-only. 'account' and 'admin-cli' are system clients the adapter must skip. Secret times are epoch seconds in client attributes; expiration '0' means never.",
+  "roles": {
+    "realm": [
+      { "name": "user", "description": "Standard application user" },
+      { "name": "view-events", "description": "Read audit events" }
+    ],
+    "client": {
+      "realm-management": [
+        { "name": "realm-admin", "description": "Full realm administration" },
+        { "name": "view-users", "description": "Read users" }
+      ]
+    }
+  },
+  "users": [
+    {
+      "id": "kc-u-1",
+      "username": "alice.chen",
+      "enabled": true,
+      "email": "alice.chen@example.com",
+      "firstName": "Alice",
+      "lastName": "Chen",
+      "createdTimestamp": 1654070400000,
+      "realmRoles": ["offline_access", "uma_authorization", "user"],
+      "clientRoles": {}
+    },
+    {
+      "id": "kc-sa-1",
+      "username": "service-account-svc-payment-bot",
+      "enabled": true,
+      "serviceAccountClientId": "svc-payment-bot",
+      "createdTimestamp": 1673769600000,
+      "realmRoles": ["default-roles-example"],
+      "clientRoles": {
+        "realm-management": ["realm-admin"]
+      }
+    },
+    {
+      "id": "kc-sa-2",
+      "username": "service-account-svc-data-sync",
+      "enabled": true,
+      "serviceAccountClientId": "svc-data-sync",
+      "createdTimestamp": 1746090000000,
+      "realmRoles": ["view-events"],
+      "clientRoles": {}
+    },
+    {
+      "id": "kc-sa-3",
+      "username": "service-account-legacy-integration",
+      "enabled": true,
+      "serviceAccountClientId": "legacy-integration",
+      "createdTimestamp": 1704067200000,
+      "realmRoles": [],
+      "clientRoles": {
+        "realm-management": ["realm-admin"]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "id": "client-uuid-account",
+      "clientId": "account",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": false,
+      "standardFlowEnabled": true,
+      "protocol": "openid-connect"
+    },
+    {
+      "id": "client-uuid-admin-cli",
+      "clientId": "admin-cli",
+      "enabled": true,
+      "publicClient": true,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect"
+    },
+    {
+      "id": "client-uuid-payment",
+      "clientId": "svc-payment-bot",
+      "name": "Payment Processing Service",
+      "description": "OAuth client for the payment automation service",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "secret": "REDACTED-rotate-me",
+      "protocol": "openid-connect",
+      "attributes": {
+        "client.secret.creation.time": "1673769600",
+        "client.secret.expiration.time": "0"
+      }
+    },
+    {
+      "id": "client-uuid-datasync",
+      "clientId": "svc-data-sync",
+      "name": "Nightly Data Sync",
+      "description": "OAuth client for the nightly data sync job",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "secret": "REDACTED-rotate-me",
+      "protocol": "openid-connect",
+      "attributes": {
+        "client.secret.creation.time": "1746090000",
+        "client.secret.expiration.time": "0"
+      }
+    },
+    {
+      "id": "client-uuid-legacy",
+      "clientId": "legacy-integration",
+      "name": "Legacy Integration",
+      "description": "Old integration client with no MidPoint governance record",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "secret": "REDACTED-rotate-me",
+      "protocol": "openid-connect",
+      "attributes": {
+        "client.secret.creation.time": "1704067200",
+        "client.secret.expiration.time": "0"
+      }
+    }
+  ]
+}
