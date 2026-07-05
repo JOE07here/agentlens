@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ScanProvider } from "./providers";
+import { BRAND } from "@/lib/brand";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgentLens — agent identity risk scanner",
+  title: `${BRAND.name} — ${BRAND.tagline.toLowerCase()}`,
   description:
     "Browser-only scanner for risky non-human / AI-agent identities across MidPoint and Keycloak. Nothing leaves your browser.",
 };

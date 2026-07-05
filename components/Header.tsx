@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BRAND } from "@/lib/brand";
 
 export function Header() {
   return (
@@ -25,9 +26,9 @@ export function Header() {
           </span>
           <span>
             <span className="block font-semibold leading-tight tracking-tight text-ink">
-              AgentLens
+              {BRAND.name}
             </span>
-            <span className="block text-xs text-ink-soft">Agent identity risk scanner</span>
+            <span className="block text-xs text-ink-soft">{BRAND.tagline}</span>
           </span>
         </Link>
         <span className="hidden items-center gap-1.5 rounded-full bg-moat-soft px-3 py-1 text-xs font-medium text-moat ring-1 ring-inset ring-moat/20 sm:inline-flex">

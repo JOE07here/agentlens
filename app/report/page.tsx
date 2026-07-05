@@ -35,7 +35,7 @@ export default function ReportPage() {
             Scan results live in memory only, so a refresh clears them.
           </p>
           <Link
-            href="/"
+            href="/scan"
             className="mt-6 inline-block rounded-lg bg-brand px-5 py-2.5 font-semibold text-white hover:bg-brand/90"
           >
             Start a scan
@@ -65,7 +65,7 @@ export default function ReportPage() {
             <ExportButton onClick={() => downloadJson(scan)}>JSON</ExportButton>
             <ExportButton onClick={() => downloadCsv(scan)}>CSV</ExportButton>
             <Link
-              href="/"
+              href="/scan"
               className="rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand/90"
             >
               New scan
