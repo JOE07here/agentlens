@@ -2,6 +2,8 @@
 
 **Browser-only risk scanner for non-human / AI-agent identities.**
 
+**[▶ Live demo](https://joe07here.github.io/agentlens/)** — try it in your browser with the bundled sample data, nothing to install.
+
 AgentLens reads a [MidPoint](https://evolveum.com/midpoint/) identity export and a
 [Keycloak](https://www.keycloak.org/) realm export, **correlates the same agent across
 both systems**, and ranks its risks. Everything runs in your browser — no server, no

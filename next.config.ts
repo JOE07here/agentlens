@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
+// GITHUB_PAGES is set by the deploy workflow so the app is served
+// correctly from https://joe07here.github.io/agentlens/
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "export",
+  basePath: process.env.GITHUB_PAGES === "true" ? "/agentlens" : "",
 };
 
 export default nextConfig;
