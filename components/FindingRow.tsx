@@ -22,7 +22,7 @@ export function FindingRow({ finding }: { finding: Finding }) {
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="font-semibold text-ink">{finding.title}</h3>
-          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600">
+          <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-500/20 dark:text-slate-300">
             {RULE_LABEL[finding.rule] ?? finding.rule}
           </span>
         </div>
@@ -33,13 +33,13 @@ export function FindingRow({ finding }: { finding: Finding }) {
       </div>
 
       <div className="mt-1.5 flex items-center gap-2">
-        <span className="font-mono text-sm text-brand">{finding.agentName}</span>
+        <span className="font-mono text-sm text-brand-ink">{finding.agentName}</span>
         <AgentTypeChip type={finding.agentType} />
       </div>
 
       <p className="mt-2 text-sm text-ink">{finding.reason}</p>
 
-      <p className="mt-2 text-sm text-moat">
+      <p className="mt-2 text-sm text-moat-ink">
         <span className="font-semibold">Recommended:</span> {finding.recommendedAction}
       </p>
 

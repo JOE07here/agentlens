@@ -1,27 +1,64 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
- * AgentLens is deliberately high-contrast and light-only (a hard product rule:
- * light background, dark text, never low-contrast). We do NOT follow the OS
- * dark-mode preference.
+ * CyberLens theme. Light is the default; `.dark` on <html> overrides the
+ * palette. The user preference (light / dark / system) is applied by
+ * <ThemeToggle> plus a pre-paint script in app/layout.tsx.
+ *
+ * Contrast is a hard product rule in BOTH modes: body text vs background
+ * must stay at or above WCAG AA. Two tokens exist per accent on purpose:
+ *   --cl-brand      solid fills that carry white text
+ *   --cl-brand-ink  accent text/borders sitting on surface/canvas
+ * In light mode they are equal; in dark mode the -ink variants are lighter
+ * so text keeps contrast while fills stay saturated.
  */
-@theme {
-  --color-brand: #2c3a8c;
-  --color-brand-soft: #eaedf8;
-  --color-moat: #0e7a6e;
-  --color-moat-soft: #e2f4f1;
-  --color-ink: #161a22;
-  --color-ink-soft: #4c5462;
-  --color-surface: #ffffff;
-  --color-canvas: #f5f6f8;
-  --color-hairline: #dce0e7;
+:root {
+  color-scheme: light;
+  --cl-brand: #2c3a8c;
+  --cl-brand-ink: #2c3a8c;
+  --cl-brand-soft: #eaedf8;
+  --cl-moat: #0e7a6e;
+  --cl-moat-ink: #0e7a6e;
+  --cl-moat-soft: #e2f4f1;
+  --cl-ink: #161a22;
+  --cl-ink-soft: #4c5462;
+  --cl-surface: #ffffff;
+  --cl-canvas: #f5f6f8;
+  --cl-hairline: #dce0e7;
+}
+
+.dark {
+  color-scheme: dark;
+  --cl-brand: #4a5bd6;
+  --cl-brand-ink: #a5b2f7;
+  --cl-brand-soft: #1c2342;
+  --cl-moat: #12897c;
+  --cl-moat-ink: #4fd1bf;
+  --cl-moat-soft: #0f2b28;
+  --cl-ink: #e7eaf1;
+  --cl-ink-soft: #9aa3b3;
+  --cl-surface: #151a23;
+  --cl-canvas: #0e1218;
+  --cl-hairline: #29303d;
+}
+
+@theme inline {
+  --color-brand: var(--cl-brand);
+  --color-brand-ink: var(--cl-brand-ink);
+  --color-brand-soft: var(--cl-brand-soft);
+  --color-moat: var(--cl-moat);
+  --color-moat-ink: var(--cl-moat-ink);
+  --color-moat-soft: var(--cl-moat-soft);
+  --color-ink: var(--cl-ink);
+  --color-ink-soft: var(--cl-ink-soft);
+  --color-surface: var(--cl-surface);
+  --color-canvas: var(--cl-canvas);
+  --color-hairline: var(--cl-hairline);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-:root {
-  color-scheme: light;
 }
 
 html {

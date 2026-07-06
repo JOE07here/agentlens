@@ -1,42 +1,36 @@
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { LogoLockup } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
+/** App header used on the scanner and report pages (the landing page has its own nav). */
 export function Header() {
   return (
-    <header className="border-b border-hairline bg-surface">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-4">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand text-white"
-            aria-hidden="true"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="2" />
-              <circle cx="11" cy="11" r="2.5" fill="currentColor" />
-              <line
-                x1="15.8"
-                y1="15.8"
-                x2="20"
-                y2="20"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </span>
-          <span>
-            <span className="block font-semibold leading-tight tracking-tight text-ink">
-              {BRAND.name}
-            </span>
-            <span className="block text-xs text-ink-soft">{BRAND.tagline}</span>
-          </span>
+    <header className="sticky top-0 z-10 border-b border-hairline bg-surface/90 backdrop-blur">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-3">
+        <Link href="/" className="shrink-0">
+          <LogoLockup withTagline />
         </Link>
-        <span className="hidden items-center gap-1.5 rounded-full bg-moat-soft px-3 py-1 text-xs font-medium text-moat ring-1 ring-inset ring-moat/20 sm:inline-flex">
-          <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true">
-            <circle cx="4" cy="4" r="4" fill="currentColor" />
-          </svg>
-          Runs entirely in your browser
-        </span>
+        <div className="flex items-center gap-4">
+          <nav className="hidden items-center gap-4 text-sm font-medium text-ink-soft sm:flex">
+            <Link href="/scan" className="hover:text-ink">
+              Scanner
+            </Link>
+            <Link href="/case-study" className="hover:text-ink">
+              Case study
+            </Link>
+            <a href={BRAND.repoUrl} className="hover:text-ink">
+              GitHub
+            </a>
+          </nav>
+          <span className="hidden items-center gap-1.5 rounded-full bg-moat-soft px-3 py-1 text-xs font-medium text-moat-ink ring-1 ring-inset ring-moat/20 lg:inline-flex">
+            <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true">
+              <circle cx="4" cy="4" r="4" fill="currentColor" />
+            </svg>
+            Runs entirely in your browser
+          </span>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

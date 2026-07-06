@@ -79,7 +79,7 @@ export function FileDrop({ label, accept, hint, fileName, onLoad, onClear }: Fil
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="font-semibold text-brand underline"
+                className="font-semibold text-brand-ink underline"
               >
                 browse
               </button>

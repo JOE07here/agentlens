@@ -9,7 +9,7 @@ function RoleList({ access }: { access: Access[] }) {
       {access.map((a) => (
         <span
           key={`${a.kind}:${a.name}`}
-          className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs text-slate-700"
+          className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs text-slate-700 dark:bg-slate-500/20 dark:text-slate-300"
           title={a.kind}
         >
           {a.name}
@@ -30,7 +30,7 @@ function CredentialList({ credentials }: { credentials: Credential[] }) {
             <span className="font-medium text-ink">{c.type}</span>
             <span className="text-xs text-ink-soft">created {formatDate(c.createdAt)}</span>
             <span
-              className={`text-xs font-medium ${neverExpires ? "text-red-700" : "text-ink-soft"}`}
+              className={`text-xs font-medium ${neverExpires ? "text-red-700 dark:text-red-400" : "text-ink-soft"}`}
             >
               {neverExpires ? "never expires" : `expires ${formatDate(c.expiresAt)}`}
             </span>
@@ -50,7 +50,7 @@ function Side({
   present: boolean;
   children: React.ReactNode;
 }) {
-  const accent = system === "MidPoint" ? "text-brand" : "text-moat";
+  const accent = system === "MidPoint" ? "text-brand-ink" : "text-moat-ink";
   return (
     <div className="flex-1 rounded-lg border border-hairline bg-canvas/60 p-3">
       <div className={`mb-2 text-xs font-bold uppercase tracking-wide ${accent}`}>

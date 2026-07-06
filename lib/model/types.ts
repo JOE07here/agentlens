@@ -1,5 +1,5 @@
 /**
- * AgentLens — canonical data model.
+ * CyberLens — canonical data model.
  *
  * Every adapter outputs these shapes, and every rule reads them. Keeping the
  * model source-agnostic is what lets us add new IdP adapters later without
@@ -76,7 +76,7 @@ export type MatchConfidence = "exact" | "high" | "medium" | "low";
 
 /**
  * One logical agent — the result of correlating identities across systems.
- * This is AgentLens' headline artifact: a service account's MidPoint roles,
+ * This is CyberLens' headline artifact: a service account's MidPoint roles,
  * its Keycloak client, and its secret, all in one place.
  */
 export interface CorrelatedAgent {

@@ -1,17 +1,17 @@
-# AgentLens
+# CyberLens
 
-**Browser-only risk scanner for non-human / AI-agent identities.**
+**Browser-only risk scanner for non-human / AI-agent identities.** *(formerly AgentLens)*
 
-**[▶ Live demo](https://joe07here.github.io/agentlens/)** — try it in your browser with the bundled sample data, nothing to install.
+**[▶ Live demo](https://joe07here.github.io/cyberlens/)** — try it in your browser with the bundled sample data, nothing to install.
 
-AgentLens reads a [MidPoint](https://evolveum.com/midpoint/) identity export and a
+CyberLens reads a [MidPoint](https://evolveum.com/midpoint/) identity export and a
 [Keycloak](https://www.keycloak.org/) realm export, **correlates the same agent across
 both systems**, and ranks its risks. Everything runs in your browser — no server, no
 upload, no network calls. Nothing leaves the device.
 
 ## Why it's different
 
-Most tools look at one system at a time. AgentLens' moat is **cross-stack correlation**:
+Most tools look at one system at a time. CyberLens' moat is **cross-stack correlation**:
 it links a MidPoint identity to its Keycloak OAuth client so one real agent shows up
 **once**, with its full picture — governance roles *and* auth client *and* its secret.
 That combined view is what surfaces risks neither system shows on its own (e.g. a service
