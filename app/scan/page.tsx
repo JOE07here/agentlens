@@ -6,10 +6,12 @@ import { Header } from "@/components/Header";
 import { Pipeline } from "@/components/Pipeline";
 import { FileDrop } from "@/components/FileDrop";
 import { GuideSteps } from "@/components/GuideSteps";
+import { ScanProgressTimeline } from "@/components/ScanProgressTimeline";
 import { useScan } from "@/app/providers";
 import { runScan } from "@/lib/pipeline";
 import { sampleMidpointXml, sampleKeycloakJson } from "@/lib/samples";
 import { BRAND } from "@/lib/brand";
+import type { ScanResult } from "@/lib/model/types";
 
 interface LoadedFile {
   name: string;
@@ -29,24 +31,31 @@ export default function ScanPage() {
   const [midpointError, setMidpointError] = useState<string | null>(null);
   const [keycloakError, setKeycloakError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<ScanResult | null>(null);
 
   const canScan = Boolean(midpoint || keycloak);
+  const busy = pending !== null;
 
   function handleScan() {
     setError(null);
-    setBusy(true);
     try {
+      // The analysis is synchronous and fast; the timeline below replays the
+      // pipeline stages so the user sees what just happened, then navigates.
       const result = runScan({
         midpointXml: midpoint?.content,
         keycloakJson: keycloak?.content,
       });
-      setScan(result);
-      router.push("/report");
+      setPending(result);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : String(caught));
-      setBusy(false);
+      setPending(null);
     }
+  }
+
+  function finishScan() {
+    if (!pending) return;
+    setScan(pending);
+    router.push("/report");
   }
 
   function loadSample() {
@@ -162,34 +171,25 @@ export default function ScanPage() {
           </div>
         )}
 
-        <section className="mt-6 flex flex-wrap items-center gap-4">
-          <button
-            type="button"
-            onClick={handleScan}
-            disabled={!canScan || busy}
-            className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {busy ? (
-              <span className="inline-flex items-center gap-2">
-                <svg
-                  className="h-4 w-4 animate-spin"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="3" opacity="0.3" />
-                  <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                </svg>
-                Scanning…
-              </span>
-            ) : (
-              "Run scan"
-            )}
-          </button>
-          {!canScan && (
-            <span className="text-sm text-ink-soft">
-              Nothing loaded yet — add at least one export, or use the sample data above.
-            </span>
+        <section className="mt-6">
+          {busy ? (
+            <ScanProgressTimeline onDone={finishScan} />
+          ) : (
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                type="button"
+                onClick={handleScan}
+                disabled={!canScan}
+                className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white shadow-sm transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Run scan
+              </button>
+              {!canScan && (
+                <span className="text-sm text-ink-soft">
+                  Nothing loaded yet — add at least one export, or use the sample data above.
+                </span>
+              )}
+            </div>
           )}
         </section>
 

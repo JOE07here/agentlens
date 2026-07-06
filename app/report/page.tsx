@@ -3,10 +3,10 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
-import { SummaryCards } from "@/components/SummaryCards";
 import { FindingRow } from "@/components/FindingRow";
 import { AgentPanel } from "@/components/AgentPanel";
 import { EmptyState } from "@/components/EmptyState";
+import { ReportDashboard } from "@/components/ReportDashboard";
 import { useScan } from "@/app/providers";
 import { downloadCsv, downloadJson } from "@/lib/report/exportData";
 import { downloadHtmlReport } from "@/lib/report/exportHtml";
@@ -20,6 +20,14 @@ const RULE_LABEL: Record<string, string> = {
   dormancy: "Dormancy",
   "sod-conflict": "Separation of duties",
   "standing-credential": "Standing credential",
+};
+
+type SourceFilter = "all" | "midpoint" | "keycloak" | "correlated";
+
+const SOURCE_LABEL: Record<Exclude<SourceFilter, "all">, string> = {
+  midpoint: "MidPoint",
+  keycloak: "Keycloak",
+  correlated: "Correlated",
 };
 
 function ExportButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
@@ -64,39 +72,34 @@ export default function ReportPage() {
   const [query, setQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState<RiskLevel | "all">("all");
   const [ruleFilter, setRuleFilter] = useState<string | "all">("all");
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
 
   const findings = useMemo(() => scan?.findings ?? [], [scan]);
 
-  const ruleCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const finding of findings) {
-      counts.set(finding.rule, (counts.get(finding.rule) ?? 0) + 1);
-    }
-    return counts;
-  }, [findings]);
-
-  const topAgents = useMemo(() => {
-    const byAgent = new Map<string, { score: number; count: number }>();
-    for (const finding of findings) {
-      const entry = byAgent.get(finding.agentName) ?? { score: 0, count: 0 };
-      entry.score = Math.max(entry.score, finding.score);
-      entry.count += 1;
-      byAgent.set(finding.agentName, entry);
-    }
-    return [...byAgent.entries()]
-      .sort((a, b) => b[1].score - a[1].score)
-      .slice(0, 3);
-  }, [findings]);
+  // agentId -> sources, for the MidPoint / Keycloak / Correlated filter.
+  const agentSources = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const agent of scan?.agents ?? []) map.set(agent.id, agent.sources);
+    return map;
+  }, [scan]);
 
   const visibleFindings = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return findings.filter(
-      (finding) =>
-        (levelFilter === "all" || finding.level === levelFilter) &&
-        (ruleFilter === "all" || finding.rule === ruleFilter) &&
-        (q === "" || finding.agentName.toLowerCase().includes(q)),
-    );
-  }, [findings, query, levelFilter, ruleFilter]);
+    return findings.filter((finding) => {
+      if (levelFilter !== "all" && finding.level !== levelFilter) return false;
+      if (ruleFilter !== "all" && finding.rule !== ruleFilter) return false;
+      if (q !== "" && !finding.agentName.toLowerCase().includes(q)) return false;
+      if (sourceFilter !== "all") {
+        const sources = agentSources.get(finding.agentId) ?? [];
+        if (sourceFilter === "correlated") {
+          if (sources.length < 2) return false;
+        } else if (!sources.includes(sourceFilter)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [findings, query, levelFilter, ruleFilter, sourceFilter, agentSources]);
 
   if (!scan) {
     return (
@@ -122,7 +125,8 @@ export default function ReportPage() {
 
   const correlated = scan.agents.filter((a) => a.sources.length > 1);
   const singles = scan.agents.filter((a) => a.sources.length === 1);
-  const filtersActive = query.trim() !== "" || levelFilter !== "all" || ruleFilter !== "all";
+  const filtersActive =
+    query.trim() !== "" || levelFilter !== "all" || ruleFilter !== "all" || sourceFilter !== "all";
 
   return (
     <>
@@ -132,7 +136,7 @@ export default function ReportPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-ink">Scan results</h1>
             <p className="mt-1 text-sm text-ink-soft">
-              Scanned {formatDate(scan.scannedAt)} · {scan.stats.totalAgents} agents ·{" "}
+              Point-in-time scan · {formatDate(scan.scannedAt)} · {scan.stats.totalAgents} agents ·{" "}
               {scan.summary.total} findings
             </p>
           </div>
@@ -161,63 +165,8 @@ export default function ReportPage() {
         )}
 
         <div className="mt-6">
-          <SummaryCards summary={scan.summary} stats={scan.stats} />
+          <ReportDashboard scan={scan} onSelectAgent={setQuery} />
         </div>
-
-        {topAgents.length > 0 && (
-          <section className="mt-6 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-hairline bg-surface p-4">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                Top risky agents
-              </h2>
-              <ol className="mt-2 space-y-1.5">
-                {topAgents.map(([name, info], index) => (
-                  <li key={name} className="flex items-center justify-between gap-2 text-sm">
-                    <span className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-ink-soft">{index + 1}.</span>
-                      <button
-                        type="button"
-                        onClick={() => setQuery(name)}
-                        className="font-mono text-brand-ink underline-offset-2 hover:underline"
-                        title="Filter findings to this agent"
-                      >
-                        {name}
-                      </button>
-                    </span>
-                    <span className="text-xs tabular-nums text-ink-soft">
-                      score {info.score} · {info.count} finding{info.count === 1 ? "" : "s"}
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-            <div className="rounded-xl border border-hairline bg-surface p-4">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                Findings by risk type
-              </h2>
-              <ul className="mt-2 space-y-1.5">
-                {Object.entries(RULE_LABEL).map(([rule, label]) => {
-                  const count = ruleCounts.get(rule) ?? 0;
-                  const share = findings.length > 0 ? (count / findings.length) * 100 : 0;
-                  return (
-                    <li key={rule} className="flex items-center gap-2 text-sm">
-                      <span className="w-40 shrink-0 text-ink">{label}</span>
-                      <span className="h-2 flex-1 overflow-hidden rounded-full bg-canvas">
-                        <span
-                          className="block h-full rounded-full bg-brand"
-                          style={{ width: `${share}%` }}
-                        />
-                      </span>
-                      <span className="w-6 text-right text-xs tabular-nums text-ink-soft">
-                        {count}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </section>
-        )}
 
         <section className="mt-10">
           <h2 className="border-l-4 border-brand pl-3 text-lg font-semibold text-ink">
@@ -229,8 +178,8 @@ export default function ReportPage() {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by agent name…"
-              aria-label="Search findings by agent name"
+              placeholder="Search by identity name…"
+              aria-label="Search findings by identity name"
               className="w-56 rounded-lg border border-hairline bg-surface px-3 py-1.5 text-sm text-ink placeholder:text-ink-soft focus:border-brand-ink focus:outline-none"
             />
             <span className="mx-1 hidden h-5 w-px bg-hairline sm:block" aria-hidden="true" />
@@ -255,6 +204,19 @@ export default function ReportPage() {
                 {label}
               </FilterChip>
             ))}
+            <span className="mx-1 hidden h-5 w-px bg-hairline sm:block" aria-hidden="true" />
+            <FilterChip active={sourceFilter === "all"} onClick={() => setSourceFilter("all")}>
+              All sources
+            </FilterChip>
+            {(Object.keys(SOURCE_LABEL) as Array<Exclude<SourceFilter, "all">>).map((source) => (
+              <FilterChip
+                key={source}
+                active={sourceFilter === source}
+                onClick={() => setSourceFilter(source)}
+              >
+                {SOURCE_LABEL[source]}
+              </FilterChip>
+            ))}
           </div>
 
           {filtersActive && (
@@ -266,6 +228,7 @@ export default function ReportPage() {
                   setQuery("");
                   setLevelFilter("all");
                   setRuleFilter("all");
+                  setSourceFilter("all");
                 }}
                 className="text-brand-ink underline underline-offset-2 hover:text-ink"
               >
@@ -283,7 +246,7 @@ export default function ReportPage() {
             ) : visibleFindings.length === 0 ? (
               <EmptyState
                 title="No findings match the current filters"
-                body="Try a different agent name, severity, or risk type — or clear the filters."
+                body="Try a different identity name, severity, risk type, or source — or clear the filters."
               />
             ) : (
               visibleFindings.map((finding) => <FindingRow key={finding.id} finding={finding} />)

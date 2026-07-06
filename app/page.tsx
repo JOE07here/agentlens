@@ -5,6 +5,11 @@ import { LogoLockup, LogoMark } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { RiskRuleCard } from "@/components/RiskRuleCard";
 import { MetricCard } from "@/components/MetricCard";
+import { GuidedDemo } from "@/components/GuidedDemo";
+import { PipelineVisualizer } from "@/components/PipelineVisualizer";
+import { CorrelationBeforeAfter } from "@/components/CorrelationBeforeAfter";
+import { UserJourneySection } from "@/components/UserJourneySection";
+import { LearnTooltip } from "@/components/LearnTooltip";
 
 const TRUST_CARDS = [
   {
@@ -23,15 +28,6 @@ const TRUST_CARDS = [
     title: "Open source",
     body: "Every line is on GitHub. Audit the rules, tune the thresholds.",
   },
-];
-
-const PIPELINE_STEPS = [
-  { name: "Ingest", body: "Parse the MidPoint XML and Keycloak JSON exports" },
-  { name: "Normalize", body: "Fold both into one canonical identity model" },
-  { name: "Correlate", body: "Link the same agent across both systems" },
-  { name: "Analyze", body: "Run the four risk rules against every agent" },
-  { name: "Score", body: "Rank findings worst-first by severity" },
-  { name: "Report", body: "Review in the browser, export HTML / JSON / CSV" },
 ];
 
 export default function Landing() {
@@ -95,6 +91,7 @@ export default function Landing() {
               >
                 Try sample scan
               </Link>
+              <GuidedDemo />
               <a
                 href={BRAND.repoUrl}
                 className="rounded-lg border border-hairline bg-surface px-6 py-3 font-semibold text-ink transition-colors hover:border-ink-soft"
@@ -127,11 +124,16 @@ export default function Landing() {
               Service accounts outnumber people — and nobody reviews them
             </h2>
             <p className="mt-4 text-ink-soft">
-              Human accounts get joiner-mover-leaver processes and access reviews. Service
-              accounts, AI agents, and workload identities quietly accumulate privileges, keep
-              never-expiring secrets, and stay enabled long after their job ended. They hold some
-              of the most privileged, least-watched access in the environment — {BRAND.name} puts
-              them under the same scrutiny.
+              Human accounts get joiner-mover-leaver processes and{" "}
+              <LearnTooltip term="access review">access reviews</LearnTooltip>.{" "}
+              <LearnTooltip term="service account">Service accounts</LearnTooltip>,{" "}
+              <LearnTooltip term="ai agent">AI agents</LearnTooltip>, and{" "}
+              <LearnTooltip term="workload identity">workload identities</LearnTooltip> quietly
+              accumulate privileges, keep never-expiring secrets, and stay enabled long after
+              their job ended. They hold some of the most privileged, least-watched access in the
+              environment — {BRAND.name} puts them under the same scrutiny, guided by{" "}
+              <LearnTooltip term="least privilege">least privilege</LearnTooltip> and{" "}
+              <LearnTooltip term="zero trust">Zero Trust</LearnTooltip> principles.
             </p>
           </div>
         </section>
@@ -159,40 +161,14 @@ export default function Landing() {
                 One agent. One picture.
               </h2>
               <p className="mt-4 text-ink-soft">
-                Most tools look at one system at a time. {BRAND.name} links a MidPoint identity to
-                its Keycloak OAuth client, so one real agent shows up once — governance roles, auth
-                client and credentials combined. That&rsquo;s what surfaces an agent that is an
-                admin in MidPoint <em>and</em> holds a never-expiring secret in Keycloak.
+                Most tools look at one system at a time. {BRAND.name} links a{" "}
+                <LearnTooltip term="midpoint">MidPoint</LearnTooltip> identity to its{" "}
+                <LearnTooltip term="keycloak">Keycloak</LearnTooltip> OAuth client, so one real
+                agent shows up once — governance roles, auth client and credentials combined.
               </p>
             </div>
-            <div className="mx-auto mt-12 flex max-w-3xl flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <div className="w-full rounded-xl border border-hairline bg-canvas p-4 text-center sm:w-56">
-                <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                  MidPoint · IGA
-                </p>
-                <p className="mt-1 font-mono text-sm text-ink">svc-payment-bot</p>
-                <p className="mt-1 text-xs text-ink-soft">roles · owner · lifecycle</p>
-              </div>
-              <span className="text-2xl text-moat-ink" aria-hidden="true">
-                ⇄
-              </span>
-              <div className="w-full rounded-xl border border-hairline bg-canvas p-4 text-center sm:w-56">
-                <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                  Keycloak · IdP
-                </p>
-                <p className="mt-1 font-mono text-sm text-ink">svc-payment-bot</p>
-                <p className="mt-1 text-xs text-ink-soft">OAuth client · secret · scopes</p>
-              </div>
-              <span className="text-2xl text-moat-ink" aria-hidden="true">
-                →
-              </span>
-              <div className="w-full rounded-xl border-2 border-moat bg-moat-soft p-4 text-center sm:w-56">
-                <p className="text-xs font-semibold uppercase tracking-wide text-moat-ink">
-                  Correlated agent
-                </p>
-                <p className="mt-1 font-mono text-sm text-ink">svc-payment-bot</p>
-                <p className="mt-1 text-xs text-ink-soft">full risk picture, ranked</p>
-              </div>
+            <div className="mt-12">
+              <CorrelationBeforeAfter />
             </div>
           </div>
         </section>
@@ -241,20 +217,12 @@ export default function Landing() {
                 runs locally in your browser tab.
               </p>
             </div>
-            <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {PIPELINE_STEPS.map((step, i) => (
-                <li
-                  key={step.name}
-                  className="rounded-2xl border border-hairline bg-canvas p-6"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-soft text-sm font-bold text-brand-ink">
-                    {i + 1}
-                  </span>
-                  <h3 className="mt-3 font-semibold text-ink">{step.name}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">{step.body}</p>
-                </li>
-              ))}
-            </ol>
+            <div className="mt-12">
+              <PipelineVisualizer />
+              <p className="mt-3 text-center text-xs text-ink-soft">
+                Click any stage to see what it does — with example input and output.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -307,6 +275,24 @@ export default function Landing() {
                 </li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        {/* ── IAM review journey ──────────────────────────────── */}
+        <section className="border-t border-hairline bg-canvas">
+          <div className="mx-auto max-w-6xl px-5 py-20">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-ink">
+                How {BRAND.name} helps an IAM review
+              </h2>
+              <p className="mt-4 text-ink-soft">
+                From raw exports to an audit-ready remediation list — a point-in-time scan that
+                slots into the access review you already run.
+              </p>
+            </div>
+            <div className="mt-10">
+              <UserJourneySection />
+            </div>
           </div>
         </section>
 
